@@ -14,10 +14,11 @@ export class AuthService {
   ) {}
 
   async signUp(createAuthDto: CreateAuthDto) {
-    const { password } = createAuthDto;
+    const { password, email } = createAuthDto;
     const hash = await argon2.hash(password);
     const auth = this.authRepository.create({
       ...createAuthDto,
+      email: email.toLowerCase(),
       password: hash,
     });
     await this.authRepository.save(auth);
