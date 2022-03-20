@@ -29,4 +29,9 @@ export class AuthController {
   update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
     return this.authService.update(id, updateAuthDto);
   }
+
+  // @Get('me')
+  // getMe() {
+  //   return this.authService.getMe();
+  // }
 }
