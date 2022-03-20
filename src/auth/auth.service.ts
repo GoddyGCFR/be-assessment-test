@@ -5,12 +5,18 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { AuthEntity } from './entities/auth.entity';
 import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(AuthEntity)
     private readonly authRepository: Repository<AuthEntity>,
+
+    private readonly jwt: JwtService,
+
+    private readonly config: ConfigService,
   ) {}
 
   async signUp(createAuthDto: CreateAuthDto) {
@@ -28,13 +34,15 @@ export class AuthService {
   async signIn(signInDto: CreateAuthDto) {
     const { password, email } = signInDto;
 
-    const isEmail = await this.authRepository.findOne({ where: { email } });
-    if (!isEmail) return { message: 'Invalid Credentials' };
+    const user = await this.authRepository.findOne({ where: { email } });
+    if (!user) return { message: 'Invalid Credentials' };
 
-    const isPassword = await argon2.verify(isEmail.password, password);
+    const isPassword = await argon2.verify(user.password, password);
     if (!isPassword) return { message: 'Invalid Credentials' };
 
-    return { message: 'SignIn Successful' };
+    const { access_token } = await this.signToken(user.id, user.email);
+
+    return { message: 'Sign In Successful', access_token };
   }
 
   async update(id: string, updateAuthDto: UpdateAuthDto) {
@@ -70,4 +78,17 @@ export class AuthService {
   // remove(id: string) {
   //   return `This action removes a #${id} auth`;
   // }
+
+  private async signToken(id: AuthEntity['id'], email: AuthEntity['email']) {
+    const payload = { sub: id, email };
+
+    const secret = this.config.get('JWT_SECRET');
+
+    return {
+      access_token: await this.jwt.signAsync(payload, {
+        secret,
+        expiresIn: '1h',
+      }),
+    };
+  }
 }

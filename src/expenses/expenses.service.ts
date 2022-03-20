@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { Repository } from 'typeorm';
 import { ExpenseEntity } from './entities/expense.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { AuthEntity } from '../auth/entities/auth.entity';
 
 @Injectable()
 export class ExpensesService {
@@ -18,28 +20,37 @@ export class ExpensesService {
     return { message: 'Expense created successfully' };
   }
 
-  async findAll(limit = 25, page = 1): Promise<Record<string, any>> {
-    const count = await this.expensesRepository.count();
-    const paging = ExpensesService.pagination({
-      length: count,
-      limit,
-      page,
-    });
+  async findAll(id, limit = 25, page = 1): Promise<Record<string, any>> {
+    const filter = { user: id };
+    const count = await this.expensesRepository.count({ where: filter });
 
-    // const { skip, take, pages } = paging;
+    const paging = ExpensesService.pagination({ length: count, limit, page });
+
     const { skip, take, ...pagination } = paging;
 
-    const expenses = await this.expensesRepository.find({ skip, take });
+    const expenses = await this.expensesRepository.find({
+      where: filter,
+      skip,
+      take,
+    });
 
     return { expenses, pagination };
   }
 
-  findOne(id: string) {
-    return this.expensesRepository.findOne(id);
+  async findOne(userId: string, id: string) {
+    const expense = await this.expensesRepository.findOne({
+      where: { id, user: userId },
+    });
+
+    if (!expense) throw new NotFoundException(`Expense not found`);
+
+    return expense;
   }
 
-  async update(id: string, updateExpenseDto: UpdateExpenseDto) {
-    const expense = await this.expensesRepository.find({ where: { id } });
+  async update(userId: string, id: string, updateExpenseDto: UpdateExpenseDto) {
+    const expense = await this.expensesRepository.find({
+      where: { id, user: userId },
+    });
 
     if (!expense) return { message: 'This operation cannot be performed' };
 
@@ -50,7 +61,9 @@ export class ExpensesService {
     if (!keys.length) return { message: 'No data to update' };
 
     keys.forEach((key) => {
-      updatedExpense[key] = updateExpenseDto[key];
+      if (updatedExpense[key] && updatedExpense[key].length) {
+        updatedExpense[key] = updateExpenseDto[key];
+      }
     });
 
     await this.expensesRepository.update(id, updatedExpense);
@@ -58,8 +71,23 @@ export class ExpensesService {
     return { message: 'Expense updated successfully' };
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} expense`;
+  async remove(userId: string, id: string) {
+    const expense = await this.expensesRepository.findOne({
+      where: { id, user: userId },
+    });
+
+    if (!expense)
+      throw new NotFoundException(
+        `Cannot delete an expense that does not exist`,
+      );
+
+    // if (expense.id.toString() !== userId.toString()) {
+    //   throw new NotFoundException(
+    //     `Operation cannot be performed. You are not the owner of this expense`,
+    //   );
+    // }
+
+    return this.expensesRepository.delete(id);
   }
 
   // Helpers
