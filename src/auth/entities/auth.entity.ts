@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { ExpenseEntity } from '../../expenses/entities/expense.entity';
 
 @Entity('users')
 @Unique(['email'])
@@ -6,17 +13,20 @@ export class AuthEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('text')
+  @Column()
   email: string;
 
-  @Column('text')
+  @Column()
   password: string;
 
-  @Column('text')
+  @Column()
   firstName: string;
 
-  @Column('text')
+  @Column()
   lastName: string;
+
+  @OneToMany((type) => ExpenseEntity, (expense) => expense.user)
+  expenses: ExpenseEntity[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
