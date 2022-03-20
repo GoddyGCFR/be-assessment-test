@@ -20,13 +20,20 @@ export class AuthService {
       ...createAuthDto,
       password: hash,
     });
-    // return this.authRepository.save(auth);
     await this.authRepository.save(auth);
     return { message: 'Signup Successful' };
   }
 
-  signIn() {
-    // return this.authRepository;
+  async signIn(signInDto: CreateAuthDto) {
+    const { password, email } = signInDto;
+
+    const isEmail = await this.authRepository.findOne({ where: { email } });
+    if (!isEmail) return { message: 'Invalid Credentials' };
+
+    const isPassword = await argon2.verify(isEmail.password, password);
+    if (!isPassword) return { message: 'Invalid Credentials' };
+
+    return { message: 'SignIn Successful' };
   }
 
   // findOne(id: string) {
