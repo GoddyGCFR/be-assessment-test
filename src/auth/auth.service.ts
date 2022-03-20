@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { AuthEntity } from './entities/auth.entity';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -12,25 +13,31 @@ export class AuthService {
     private readonly authRepository: Repository<AuthEntity>,
   ) {}
 
-  create(createAuthDto: CreateAuthDto) {
-    const auth = this.authRepository.create(createAuthDto);
-
-    return this.authRepository.save(auth);
+  async signUp(createAuthDto: CreateAuthDto) {
+    const { password } = createAuthDto;
+    const hash = await argon2.hash(password);
+    const auth = this.authRepository.create({
+      ...createAuthDto,
+      password: hash,
+    });
+    // return this.authRepository.save(auth);
+    await this.authRepository.save(auth);
+    return { message: 'Signup Successful' };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  signIn() {
+    // return this.authRepository;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
+  // findOne(id: string) {
+  //   return `This action returns a #${id} auth`;
+  // }
+  //
+  update(id: string, updateAuthDto: UpdateAuthDto) {
     return `This action updates a #${id} auth`;
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+  //
+  // remove(id: string) {
+  //   return `This action removes a #${id} auth`;
+  // }
 }

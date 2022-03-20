@@ -17,33 +17,31 @@ export class AuthController {
 
   @Post('sign-up')
   signUp(@Body() createAuthDto: CreateAuthDto) {
-    console.log(createAuthDto);
-
-    return this.authService.create(createAuthDto);
+    return this.authService.signUp(createAuthDto);
   }
 
   @Post('sign-in')
   signIn(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+    // return this.authService.signIn(createAuthDto);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
+  // @Get()
+  // findAll() {
+  //   return this.authService.findAll();
+  // }
+  //
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.authService.findOne(id);
+  // }
+  //
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+    return this.authService.update(id, updateAuthDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
-  }
+  //
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.authService.remove(id);
+  // }
 }
