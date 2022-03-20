@@ -36,14 +36,36 @@ export class AuthService {
     return { message: 'SignIn Successful' };
   }
 
-  // findOne(id: string) {
-  //   return `This action returns a #${id} auth`;
-  // }
-  //
-  update(id: string, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async update(id: string, updateAuthDto: UpdateAuthDto) {
+    const user = await this.authRepository.findOne(id);
+    if (!user) return { message: 'You cannot perform this operation' };
+
+    const updatedData = {};
+    if (updateAuthDto.password) {
+      updatedData['password'] = await argon2.hash(updateAuthDto.password);
+    }
+
+    if (updateAuthDto.email) {
+      updatedData['email'] = updateAuthDto.email;
+      const isEmail = await this.authRepository.findOne({
+        where: { email: updateAuthDto.email },
+      });
+      if (isEmail && isEmail.id.toString() !== id.toString())
+        return { message: 'Email already taken' };
+    }
+
+    if (updateAuthDto.firstName) {
+      updatedData['firstName'] = updateAuthDto.firstName;
+    }
+
+    if (updateAuthDto.lastName) {
+      updatedData['lastName'] = updateAuthDto.lastName;
+    }
+
+    await this.authRepository.update(id, updatedData);
+    return { message: 'Update Successful' };
   }
-  //
+
   // remove(id: string) {
   //   return `This action removes a #${id} auth`;
   // }
