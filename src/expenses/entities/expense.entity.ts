@@ -21,7 +21,9 @@ export class ExpenseEntity {
   @Column('decimal', { nullable: false })
   amount: number;
 
-  @ManyToOne((type) => AuthEntity, (user) => user.expenses)
+  @ManyToOne((type) => AuthEntity, (user) => user.expenses, {
+    nullable: false,
+  })
   // @JoinTable()
   user: AuthEntity;
 
