@@ -26,11 +26,12 @@ export class ExpensesService {
       page,
     });
 
-    const { skip, take } = paging;
+    // const { skip, take, pages } = paging;
+    const { skip, take, ...pagination } = paging;
 
     const expenses = await this.expensesRepository.find({ skip, take });
 
-    return { expenses, paging };
+    return { expenses, pagination };
   }
 
   findOne(id: string) {
@@ -88,6 +89,6 @@ export class ExpensesService {
       pages.prev = { page: page - 1, limit };
     }
 
-    return { pages, skip: startIndex || 0, take: limit };
+    return { pages, skip: startIndex || 0, take: limit || 25 };
   }
 }
