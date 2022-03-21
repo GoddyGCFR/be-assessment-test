@@ -14,7 +14,5 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   description: string;
 
-  @IsUUID()
-  @IsNotEmpty()
   user: AuthEntity;
 }

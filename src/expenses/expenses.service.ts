@@ -14,8 +14,12 @@ export class ExpensesService {
     private readonly expensesRepository: Repository<ExpenseEntity>,
   ) {}
 
-  async create(createExpenseDto: CreateExpenseDto) {
-    const expense = await this.expensesRepository.create(createExpenseDto);
+  async create(userId, createExpenseDto: CreateExpenseDto) {
+    const payload = {
+      ...createExpenseDto,
+      user: userId as AuthEntity,
+    };
+    const expense = this.expensesRepository.create(payload);
     await this.expensesRepository.save(expense);
     return { message: 'Expense created successfully' };
   }
@@ -48,25 +52,24 @@ export class ExpensesService {
   }
 
   async update(userId: string, id: string, updateExpenseDto: UpdateExpenseDto) {
-    const expense = await this.expensesRepository.find({
+    const expense = await this.expensesRepository.findOne({
       where: { id, user: userId },
     });
 
     if (!expense) return { message: 'This operation cannot be performed' };
 
-    const updatedExpense = {};
-
     // Get keys of incoming update and put them in an array named keys
     const keys = Object.keys(updateExpenseDto);
+
     if (!keys.length) return { message: 'No data to update' };
 
     keys.forEach((key) => {
-      if (updatedExpense[key] && updatedExpense[key].length) {
-        updatedExpense[key] = updateExpenseDto[key];
+      if (updateExpenseDto[key] && updateExpenseDto[key]?.toString().length) {
+        expense[key] = updateExpenseDto[key];
       }
     });
 
-    await this.expensesRepository.update(id, updatedExpense);
+    await this.expensesRepository.save(expense);
 
     return { message: 'Expense updated successfully' };
   }
@@ -81,13 +84,9 @@ export class ExpensesService {
         `Cannot delete an expense that does not exist`,
       );
 
-    // if (expense.id.toString() !== userId.toString()) {
-    //   throw new NotFoundException(
-    //     `Operation cannot be performed. You are not the owner of this expense`,
-    //   );
-    // }
+    await this.expensesRepository.remove(expense);
 
-    return this.expensesRepository.delete(id);
+    return { message: 'Expense deleted successfully' };
   }
 
   // Helpers

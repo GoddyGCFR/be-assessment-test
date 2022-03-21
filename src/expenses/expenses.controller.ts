@@ -22,8 +22,9 @@ export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto) {
-    return this.expensesService.create(createExpenseDto);
+  create(@Body() createExpenseDto: CreateExpenseDto, @Req() req: Request) {
+    const { id: userId } = req.user as unknown as { id: string };
+    return this.expensesService.create(userId, createExpenseDto);
   }
 
   @Get()
@@ -32,8 +33,8 @@ export class ExpensesController {
     @Query('limit') limit: string,
     @Req() req: Request,
   ) {
-    const { id } = req.user as unknown as { id: string };
-    return this.expensesService.findAll(id, +limit, +page);
+    const { id: userId } = req.user as unknown as { id: string };
+    return this.expensesService.findAll(userId, +limit, +page);
   }
 
   // @Get()

@@ -5,11 +5,13 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { CreateAuthDto, UpdateAuthDto as PartialDto } from './dto';
+import { Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -21,17 +23,25 @@ export class AuthController {
   }
 
   @Post('sign-in')
-  signIn(@Body() createAuthDto: CreateAuthDto) {
+  signIn(@Body() createAuthDto: PartialDto) {
     return this.authService.signIn(createAuthDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch('update')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(id, updateAuthDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateAuthDto: PartialDto,
+    @Req() req: Request,
+  ) {
+    const { id: userId } = req.user as unknown as { id: string };
+    return this.authService.update(userId, updateAuthDto);
   }
 
-  // @Get('me')
-  // getMe() {
-  //   return this.authService.getMe();
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  getMe(@Req() req: Request) {
+    const { id: userId } = req.user as unknown as { id: string };
+    return this.authService.getMe(userId);
+  }
 }

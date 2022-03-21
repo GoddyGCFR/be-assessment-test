@@ -9,11 +9,11 @@ export class CreateAuthDto {
   @IsNotEmpty()
   password: string;
 
-  // @IsString()
-  // @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   firstName: string;
 
-  // @IsString()
-  // @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   lastName: string;
 }
