@@ -47,7 +47,7 @@ describe('AuthController', () => {
   it('should create a new user', () => {
     expect(
       controller.signUp({
-        email: 'johndoe222@yahoo.comm',
+        email: 'johndoe222@yahoo.com',
         password: '123456',
         lastName: 'Johnson',
         firstName: 'Smith',
