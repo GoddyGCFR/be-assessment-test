@@ -44,16 +44,6 @@ describe('AuthController', () => {
     });
   });
 
-  it('should return 401 status code (Invalid login)', () => {
-    expect(
-      controller.signIn({ email: 'johndoe@yahoo.com', password: '1aa23456' }),
-    ).toMatchObject({
-      statusCode: 401,
-      message: 'Invalid Credentials',
-      error: 'Unauthorized',
-    });
-  });
-
   it('should create a new user', () => {
     expect(
       controller.signUp({

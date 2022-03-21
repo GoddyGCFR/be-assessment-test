@@ -22,7 +22,7 @@ export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto, @Req() req: Request) {
+  create(@Body() createExpenseDto: CreateExpenseDto, @Req() req?: Request) {
     const { id: userId } = req.user as unknown as { id: string };
     return this.expensesService.create(userId, createExpenseDto);
   }
