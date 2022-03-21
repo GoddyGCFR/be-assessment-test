@@ -1,11 +1,5 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { AuthEntity } from '../../auth/entities/auth.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('expenses')
 export class ExpenseEntity {
@@ -21,11 +15,10 @@ export class ExpenseEntity {
   @Column('decimal', { nullable: false })
   amount: number;
 
-  @ManyToOne((type) => AuthEntity, (user) => user.expenses, {
+  @ManyToOne((type) => UserEntity, (user) => user.expenses, {
     nullable: false,
   })
-  // @JoinTable()
-  user: AuthEntity;
+  user: UserEntity;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

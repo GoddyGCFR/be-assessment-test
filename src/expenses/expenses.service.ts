@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ExpenseEntity } from './entities/expense.entity';
-import { AuthEntity } from '../auth/entities/auth.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class ExpensesService {
@@ -17,7 +17,7 @@ export class ExpensesService {
   async create(userId, createExpenseDto: CreateExpenseDto) {
     const payload = {
       ...createExpenseDto,
-      user: userId as AuthEntity,
+      user: userId as UserEntity,
     };
     const expense = this.expensesRepository.create(payload);
     await this.expensesRepository.save(expense);

@@ -1,47 +1,23 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto, UpdateAuthDto as PartialDto } from './dto';
-import { Request } from 'express';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthDto } from './dto';
+import { UserDto } from '../users/dto';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UsersService,
+  ) {}
 
   @Post('sign-up')
-  signUp(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.signUp(createAuthDto);
+  signUp(@Body() dto: UserDto) {
+    return this.userService.signUp(dto);
   }
 
   @Post('sign-in')
-  signIn(@Body() createAuthDto: PartialDto) {
-    return this.authService.signIn(createAuthDto);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('update')
-  update(
-    @Param('id') id: string,
-    @Body() updateAuthDto: PartialDto,
-    @Req() req: Request,
-  ) {
-    const { id: userId } = req.user as unknown as { id: string };
-    return this.authService.update(userId, updateAuthDto);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('me')
-  getMe(@Req() req: Request) {
-    const { id: userId } = req.user as unknown as { id: string };
-    return this.authService.getMe(userId);
+  signIn(@Body() dto: AuthDto) {
+    return this.userService.signIn(dto);
   }
 }

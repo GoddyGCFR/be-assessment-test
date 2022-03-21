@@ -9,7 +9,7 @@ import { ExpenseEntity } from '../../expenses/entities/expense.entity';
 
 @Entity('users')
 @Unique(['email'])
-export class AuthEntity {
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

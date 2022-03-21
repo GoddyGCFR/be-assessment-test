@@ -37,26 +37,6 @@ export class ExpensesController {
     return this.expensesService.findAll(userId, +limit, +page);
   }
 
-  // @Get()
-  // findToday() {
-  //   return this.expensesService.findAll();
-  // }
-
-  // @Get()
-  // findThisWeek() {
-  //   return this.expensesService.findAll();
-  // }
-
-  // @Get()
-  // findThisMonth() {
-  //   return this.expensesService.findAll();
-  // }
-
-  // @Get()
-  // findThisYear() {
-  //   return this.expensesService.findAll();
-  // }
-
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: Request) {
     const { id: userId } = req.user as unknown as { id: string };

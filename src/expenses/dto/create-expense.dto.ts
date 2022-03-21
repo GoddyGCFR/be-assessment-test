@@ -1,5 +1,5 @@
-import { AuthEntity } from '../../auth/entities/auth.entity';
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { UserEntity } from '../../users/entities/user.entity';
 
 export class CreateExpenseDto {
   @IsString()
@@ -14,5 +14,5 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   description: string;
 
-  user: AuthEntity;
+  user: UserEntity;
 }
